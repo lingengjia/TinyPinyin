@@ -1,11 +1,11 @@
 //
 //  EngineSwift.swift
-//  Galaxy
+//  TinyPinyin
 //
 //  Created by gengjia lin on 2026/2/9.
 //
 
-enum Engine {
+struct Engine {
 
     static func toPinyin(
         _ inputStr: String,
@@ -19,7 +19,7 @@ enum Engine {
         }
 
         if trie == nil || selector == nil {
-            // 和 Java 一样：没提供字典或选择器，按单字符转换输出
+            // Just like Java: No dictionary or selector is provided, output by single-character conversion
             var buf: [String] = []
             buf.reserveCapacity(inputStr.count)
             for (i, ch) in inputStr.enumerated() {
@@ -34,7 +34,7 @@ enum Engine {
         let emits = trie!.parseText(inputStr)
         let selectedEmits = selector!.select(emits) ?? []
 
-        // 用相同的比较器排序
+        // Sort using the same comparator
         let sortedEmits = selectedEmits.sorted { (o1, o2) -> Bool in
             if o1.start == o2.start {
                 return o1.size > o2.size
@@ -67,7 +67,7 @@ enum Engine {
                 i += sortedEmits[nextHitIndex].size
                 nextHitIndex += 1
             } else {
-                // 将第 i 个字符转为拼音
+                // Convert the i-th character to pinyin
                 resultBuf.append(Pinyin.toPinyin(chars[i]))
                 i += 1
             }
@@ -80,7 +80,10 @@ enum Engine {
         return resultBuf.joined()
     }
 
-    static func pinyinFromDict(wordInDict: String, pinyinDictSet: [PinyinDict]?) -> [String] {
+    static func pinyinFromDict(
+        wordInDict: String,
+        pinyinDictSet: [PinyinDict]?
+    ) -> [String] {
         if let dicts = pinyinDictSet {
             for dict in dicts {
                 let ws = dict.words()

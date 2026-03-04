@@ -1,8 +1,6 @@
-// The Swift Programming Language
-// https://docs.swift.org/swift-book
 //
 //  TinyPinyin.swift
-//  note-core
+//  TinyPinyin
 //
 //  Created by gengjia lin on 2026/2/9.
 //
@@ -10,8 +8,7 @@
 import Foundation
 
 public final class Pinyin {
-
-    // MARK: - 对应 Java 的静态字段
+    
     nonisolated(unsafe)
     static var mTrieDict: Trie?
     nonisolated(unsafe)
@@ -20,8 +17,6 @@ public final class Pinyin {
     static var mPinyinDicts: [PinyinDict]?
 
     private init() {}
-
-    // MARK: - Config（等价 Pinyin.Config）
 
     public final class Config {
 
@@ -35,7 +30,7 @@ public final class Pinyin {
             self.mSelector = ForwardLongestSelector()
         }
 
-        /// 添加字典，链式调用
+        // Add a dictionary and make chained calls
         @discardableResult
         public func with(_ dict: PinyinDict?) -> Config {
             guard let dict = dict else { return self }
@@ -60,18 +55,17 @@ public final class Pinyin {
         }
     }
 
-    /// 返回新的 Config 对象（等价 Pinyin.newConfig）
     public static func newConfig() -> Config {
         return Config(mPinyinDicts)
     }
 
-    /// 使用 Config 初始化 Pinyin（等价 Pinyin.init(Config)）
+    /// Initialize Pinyin using Config (equivalent to pinyin.init (Config))
     ///
-    /// 注意：Swift 里不能用“init”做静态方法名，避免和构造器冲突，
-    /// 这里用 initialize，调用方式是 Pinyin.initialize(config)
+    /// Note: In Swift, "init" cannot be used as a static method name to avoid conflicts with constructors
+    /// Here, initialize is used, and the calling method is Pinyin.initialize(config).
     public static func initialize(_ config: Config?) {
         guard let config = config else {
-            // 清空设置
+            // Clear the Settings
             mPinyinDicts = nil
             mTrieDict = nil
             mSelector = nil
@@ -79,7 +73,7 @@ public final class Pinyin {
         }
 
         guard config.valid(), let dicts = config.getPinyinDicts() else {
-            // 忽略无效 Config
+            // Ignore invalid Config
             return
         }
 
@@ -88,7 +82,7 @@ public final class Pinyin {
         mSelector = config.getSelector()
     }
 
-    /// 向 Pinyin 中追加词典（等价 Pinyin.add）
+    /// add a dictionary to Pinyin (equivalent to pinyin.add)
     public static func add(_ dict: PinyinDict?) {
         guard let dict = dict,
               !dict.words().isEmpty else {
@@ -98,7 +92,7 @@ public final class Pinyin {
         initialize(cfg)
     }
 
-    // MARK: - 字符串转拼音（等价 Pinyin.toPinyin(String, String)）
+    // MARK: - String toPinyin(equivalent pinyin.topinyin (String, String))
 
     public static func toPinyin(_ str: String, separator: String) -> String {
         return Engine.toPinyin(
@@ -110,52 +104,50 @@ public final class Pinyin {
         )
     }
 
-    // MARK: - 单字符转拼音（等价 Pinyin.toPinyin(char)）
+    // MARK: - Single-character toPinyin conversion (equivalent to pinyin.topinyin (char))
 
-    public static func toPinyin(_ c: Character) -> String {
-        if isChinese(c) {
-            if let scalar = c.unicodeScalars.first {
-                let v = scalar.value
-                if v == PinyinData.CHAR_12295 {
+    public static func toPinyin(_ char: Character) -> String {
+        if isChinese(char) {
+            if let scalar = char.unicodeScalars.first {
+                let value = scalar.value
+                if value == PinyinData.CHAR_12295 {
                     return PinyinData.PINYIN_12295
                 } else {
-                    let code = getPinyinCode(forScalarValue: v)
+                    let code = getPinyinCode(forScalarValue: value)
                     if code > 0 && code < PinyinData.PINYIN_TABLE.count {
                         return PinyinData.PINYIN_TABLE[code]
                     }
                 }
             }
         }
-        return String(c)
+        return String(char)
     }
 
-    // MARK: - 判断是否汉字（等价 Pinyin.isChinese）
+    // MARK: - Determine if it is a Chinese character (equivalent to Pinyin.isChinese)
 
-    public static func isChinese(_ c: Character) -> Bool {
-        guard let scalar = c.unicodeScalars.first else { return false }
-        let v = scalar.value
+    public static func isChinese(_ char: Character) -> Bool {
+        guard let scalar = char.unicodeScalars.first else { return false }
+        let value = scalar.value
 
-        if v == PinyinData.CHAR_12295 {
+        if value == PinyinData.CHAR_12295 {
             return true
         }
 
-        if v < PinyinData.MIN_VALUE || v > PinyinData.MAX_VALUE {
+        if value < PinyinData.MIN_VALUE || value > PinyinData.MAX_VALUE {
             return false
         }
 
-        let code = getPinyinCode(forScalarValue: v)
+        let code = getPinyinCode(forScalarValue: value)
         return code > 0
     }
 
-    // MARK: - 压缩表解码（等价 getPinyinCode / decodeIndex）
+    // MARK: - Compressed table decoding (equivalent to getPinyinCode/decodeIndex)
 
-    private static func getPinyinCode(forScalarValue v: UInt32) -> Int {
-        let offset = Int(v - PinyinData.MIN_VALUE)
-
+    private static func getPinyinCode(forScalarValue value: UInt32) -> Int {
+        let offset = Int(value - PinyinData.MIN_VALUE)
         if offset < 0 {
             return 0
         }
-
         if offset < PinyinData.PINYIN_CODE_1_OFFSET {
             return decodeIndex(
                 paddings: PinyinCode1.PINYIN_CODE_PADDING,
@@ -188,12 +180,11 @@ public final class Pinyin {
         // realIndex = indexes[offset] & 0xff
         var realIndex = Int(indexes[offset]) & 0xFF
 
-        // 如果 paddings 对应 bit 置位，则加上 256
+        // If the paddings correspond to bit Settings, add 256
         let paddingBit = Int(paddings[index1]) & PinyinData.BIT_MASKS[index2]
         if paddingBit != 0 {
             realIndex |= PinyinData.PADDING_MASK
         }
-
         return realIndex
     }
 }

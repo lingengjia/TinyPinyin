@@ -1,6 +1,6 @@
 //
 //  PinyinCode1.swift
-//  note-core
+//  TinyPinyin
 //
 //  Created by gengjia lin on 2026/2/9.
 //
@@ -8,6 +8,7 @@
 import Foundation
 
 enum PinyinCode1 {
+    
     static let PINYIN_CODE_PADDING: [Int8] = [
         -79, 79, -56, 37, -87, 41, 96, 13, -122, 58, 2,
         -122, 67, 33, -72, -128, 16, 79, -45, 92, 75, 40, 54, -50, 19, 34, -15, 102, 32, 39, 53,

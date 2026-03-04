@@ -50,7 +50,7 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         title = "TinyPinyin Demo"
         view.backgroundColor = .systemBackground
-
+        
         inputTextField.text = "你好世界"
 
         view.addSubview(inputTextField)
@@ -78,6 +78,8 @@ class ViewController: UIViewController {
             resultLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             resultLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
         ])
+        
+        demo()
     }
 
     @objc private func convertTapped() {
@@ -88,7 +90,6 @@ class ViewController: UIViewController {
         resultLabel.textColor = .label
         view.endEditing(true)
     }
-
 
     private func demo() {
         print("=== TinyPinyin Demo ===\n")

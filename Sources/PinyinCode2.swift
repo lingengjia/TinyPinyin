@@ -1,6 +1,6 @@
 //
 //  PinyinCode2.swift
-//  note-core
+//  TinyPinyin
 //
 //  Created by gengjia lin on 2026/2/9.
 //

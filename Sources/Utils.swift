@@ -1,6 +1,6 @@
 //
 //  UtilsSwift.swift
-//  Galaxy
+//  TinyPinyin
 //
 //  Created by gengjia lin on 2026/2/9.
 //

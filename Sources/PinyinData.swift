@@ -1,6 +1,6 @@
 //
 //  PinyinData.swift
-//  note-core
+//  TinyPinyin
 //
 //  Created by gengjia lin on 2026/2/9.
 //
@@ -8,6 +8,7 @@
 import Foundation
 
 enum PinyinData {
+    
     static let MIN_VALUE: UInt32 = 19968
     static let MAX_VALUE: UInt32 = 40869
 
@@ -20,6 +21,7 @@ enum PinyinData {
     static let BIT_MASKS: [Int] = [1, 2, 4, 8, 16, 32, 64, 128]
     static let PADDING_MASK: Int = 256
 
+    // Corresponding to PinyinData.PINYIN TABLE
     static let PINYIN_TABLE: [String] = [
         "", "A", "AI", "AN", "ANG", "AO", "BA", "BAI",
         "BAN", "BANG", "BAO", "BEI", "BEN", "BENG", "BI", "BIAN", "BIAO", "BIE", "BIN", "BING",

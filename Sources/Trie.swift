@@ -9,7 +9,8 @@ import Foundation
 
 public struct Emit: Hashable {
     public let start: Int
-    public let end: Int       // 包含 end，下标是 [start, end]
+    // Containing "end", with subscripts [start, end]
+    public let end: Int
     public let keyword: String
 
     public var size: Int {
@@ -21,21 +22,22 @@ public struct Emit: Hashable {
 
 public final class Trie {
 
-    // 内部节点
     private final class Node {
         var children: [Character: Node] = [:]
         weak var failure: Node?
         var emits: [String] = []
 
-        func addChild(_ c: Character) -> Node {
-            if let n = children[c] { return n }
-            let n = Node()
-            children[c] = n
-            return n
+        func addChild(_ char: Character) -> Node {
+            if let node = children[char] {
+                return node
+            }
+            let node = Node()
+            children[char] = node
+            return node
         }
 
-        func getChild(_ c: Character) -> Node? {
-            return children[c]
+        func getChild(_ char: Character) -> Node? {
+            return children[char]
         }
 
         func addEmit(_ keyword: String) {
@@ -45,17 +47,16 @@ public final class Trie {
 
     private let root = Node()
 
-    // 只允许通过 Builder 构造
     fileprivate init() {}
 
-    // 核心：解析文本，返回所有 Emit（和 Java 的 parseText 等价）
+    // Parse the text and return all Emit (equivalent to Java's parseText)
     public func parseText(_ text: String) -> [Emit] {
         var emits: [Emit] = []
         var currentNode: Node = root
         let chars = Array(text)
 
-        for (i, ch) in chars.enumerated() {
-            currentNode = getNextState(from: currentNode, with: ch)
+        for (i, char) in chars.enumerated() {
+            currentNode = getNextState(from: currentNode, with: char)
             if !currentNode.emits.isEmpty {
                 for keyword in currentNode.emits {
                     let length = keyword.count
@@ -64,24 +65,23 @@ public final class Trie {
                 }
             }
         }
-
         return emits
     }
 
-    // Aho-Corasick：沿 failure 链回溯，直到找到下一个状态
-    private func getNextState(from node: Node, with ch: Character) -> Node {
+    // Trace back along the failure chain until the next state is found
+    private func getNextState(from node: Node, with char: Character) -> Node {
         var current: Node? = node
-        while current != nil && current?.getChild(ch) == nil {
+        while current != nil && current?.getChild(char) == nil {
             if current === root {
                 current = nil
                 break
             }
             current = current?.failure
         }
-        return current?.getChild(ch) ?? root
+        return current?.getChild(char) ?? root
     }
 
-    // MARK: - Builder（等价 Trie.TrieBuilder）
+    // MARK: - Builder (equivalent to Trie.TrieBuilder)
 
     public final class Builder {
         private let trie = Trie()
@@ -106,7 +106,7 @@ public final class Trie {
         private func buildFailureLinks() {
             var queue: [Node] = []
 
-            // root 子节点的 failure 都指向 root
+            // All failures of the root child node point to root
             for child in trie.root.children.values {
                 child.failure = trie.root
                 queue.append(child)
@@ -114,26 +114,24 @@ public final class Trie {
 
             while !queue.isEmpty {
                 let current = queue.removeFirst()
-
                 for (ch, child) in current.children {
                     queue.append(child)
-
                     var failureNode = current.failure
-                    while failureNode != nil && failureNode?.getChild(ch) == nil {
+                    while failureNode != nil,
+                          failureNode?.getChild(ch) == nil {
                         if failureNode === trie.root {
                             failureNode = nil
                             break
                         }
                         failureNode = failureNode?.failure
                     }
-
                     child.failure = failureNode?.getChild(ch) ?? trie.root
-                    // failure 链上的 emits 也要合并过来
+                    // The emits on the failure chain should also be merged
                     if let f = child.failure {
                         child.emits.append(contentsOf: f.emits)
                     }
                 }
             }
         }
-    }
+     }
 }
