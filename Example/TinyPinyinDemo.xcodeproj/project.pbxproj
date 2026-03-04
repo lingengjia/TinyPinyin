@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		C0943E9D2F57EBD10022A319 /* TinyPinyin in Frameworks */ = {isa = PBXBuildFile; productRef = C0943E9C2F57EBD10022A319 /* TinyPinyin */; };
+		C0943F072F580D500022A319 /* TinyPinyin in Frameworks */ = {isa = PBXBuildFile; productRef = C0943F062F580D500022A319 /* TinyPinyin */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -41,6 +42,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C0943E9D2F57EBD10022A319 /* TinyPinyin in Frameworks */,
+				C0943F072F580D500022A319 /* TinyPinyin in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -84,6 +86,7 @@
 			name = TinyPinyinDemo;
 			packageProductDependencies = (
 				C0943E9C2F57EBD10022A319 /* TinyPinyin */,
+				C0943F062F580D500022A319 /* TinyPinyin */,
 			);
 			productName = TinyPinyinDemo;
 			productReference = C0943E832F57EB350022A319 /* TinyPinyinDemo.app */;
@@ -114,7 +117,7 @@
 			mainGroup = C0943E7A2F57EB350022A319;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				C0943E9B2F57EBD10022A319 /* XCLocalSwiftPackageReference "../../../TinyPinyin" */,
+				C0943F052F580D500022A319 /* XCLocalSwiftPackageReference "../../TinyPinyin" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = C0943E842F57EB350022A319 /* Products */;
@@ -356,14 +359,18 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		C0943E9B2F57EBD10022A319 /* XCLocalSwiftPackageReference "../../../TinyPinyin" */ = {
+		C0943F052F580D500022A319 /* XCLocalSwiftPackageReference "../../TinyPinyin" */ = {
 			isa = XCLocalSwiftPackageReference;
-			relativePath = ../../../TinyPinyin;
+			relativePath = ../../TinyPinyin;
 		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
 		C0943E9C2F57EBD10022A319 /* TinyPinyin */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = TinyPinyin;
+		};
+		C0943F062F580D500022A319 /* TinyPinyin */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = TinyPinyin;
 		};

@@ -15,7 +15,8 @@ struct Utils {
                 all.formUnion(ws)
             }
             if !all.isEmpty {
-                for key in all {
+                // Sorted order to match Android TreeSet (deterministic Trie build)
+                for key in all.sorted() {
                     builder.addKeyword(key)
                 }
                 return builder.build()

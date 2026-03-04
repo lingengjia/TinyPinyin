@@ -25,7 +25,7 @@ public final class Pinyin {
 
         fileprivate init(_ dicts: [PinyinDict]?) {
             if let dicts = dicts {
-                self.mPinyinDicts = dicts
+                self.mPinyinDicts = Array(dicts)
             }
             self.mSelector = ForwardLongestSelector()
         }
@@ -77,7 +77,8 @@ public final class Pinyin {
             return
         }
 
-        mPinyinDicts = dicts
+        // Store a copy so caller cannot mutate our list (match Android Collections.unmodifiableList)
+        mPinyinDicts = Array(dicts)
         mTrieDict = Utils.dictsToTrie(dicts)
         mSelector = config.getSelector()
     }

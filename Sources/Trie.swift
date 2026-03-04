@@ -13,6 +13,12 @@ public struct Emit: Hashable {
     public let end: Int
     public let keyword: String
 
+    public init(start: Int, end: Int, keyword: String) {
+        self.start = start
+        self.end = end
+        self.keyword = keyword
+    }
+    
     public var size: Int {
         return end - start + 1
     }

@@ -37,6 +37,14 @@ class ViewController: UIViewController {
         return btn
     }()
 
+    private let testButton: UIButton = {
+        let btn = UIButton(type: .system)
+        btn.setTitle("运行测试", for: .normal)
+        btn.titleLabel?.font = .systemFont(ofSize: 17, weight: .medium)
+        btn.translatesAutoresizingMaskIntoConstraints = false
+        return btn
+    }()
+
     private let resultLabel: UILabel = {
         let label = UILabel()
         label.numberOfLines = 0
@@ -51,14 +59,19 @@ class ViewController: UIViewController {
         title = "TinyPinyin Demo"
         view.backgroundColor = .systemBackground
         
+        let dict = TestMapDict(map:["重庆": ["CHONG", "QING"], "长安": ["CHANG", "AN"], "四川": ["SI", "CHUAN"]])
+        Pinyin.initialize(Pinyin.newConfig().with(dict))
+        
         inputTextField.text = "你好世界"
 
         view.addSubview(inputTextField)
         view.addSubview(separatorTextField)
         view.addSubview(convertButton)
+        view.addSubview(testButton)
         view.addSubview(resultLabel)
 
         convertButton.addTarget(self, action: #selector(convertTapped), for: .touchUpInside)
+        testButton.addTarget(self, action: #selector(runTestsTapped), for: .touchUpInside)
 
         NSLayoutConstraint.activate([
             inputTextField.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 24),
@@ -74,7 +87,10 @@ class ViewController: UIViewController {
             convertButton.topAnchor.constraint(equalTo: separatorTextField.bottomAnchor, constant: 20),
             convertButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
 
-            resultLabel.topAnchor.constraint(equalTo: convertButton.bottomAnchor, constant: 24),
+            testButton.topAnchor.constraint(equalTo: convertButton.bottomAnchor, constant: 12),
+            testButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+
+            resultLabel.topAnchor.constraint(equalTo: testButton.bottomAnchor, constant: 24),
             resultLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             resultLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
         ])
@@ -89,6 +105,22 @@ class ViewController: UIViewController {
         resultLabel.text = result.isEmpty ? "(空)" : result
         resultLabel.textColor = .label
         view.endEditing(true)
+    }
+
+    @objc private func runTestsTapped() {
+        let (passed, failed, results) = PinyinDictDemoTests.runAll()
+        var message = "通过 \(passed) / 失败 \(failed)"
+        if failed > 0 {
+            let failedList = results.filter { !$0.passed }
+            message += "\n\n失败用例:\n" + failedList.map { "• \($0.name): \($0.message)" }.joined(separator: "\n")
+        } else {
+            message += "\n\n全部通过 ✓"
+        }
+        resultLabel.text = message
+        resultLabel.textColor = failed > 0 ? .systemRed : .label
+        let alert = UIAlertController(title: "测试结果", message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "确定", style: .default))
+        present(alert, animated: true)
     }
 
     private func demo() {

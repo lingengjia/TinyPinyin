@@ -87,9 +87,8 @@ struct Engine {
         if let dicts = pinyinDictSet {
             for dict in dicts {
                 let ws = dict.words()
-                if ws.contains(wordInDict),
-                   let py = dict.toPinyin(wordInDict),
-                   !py.isEmpty {
+                if ws.contains(wordInDict), let py = dict.toPinyin(wordInDict) {
+                    // Match Android: use first dict that contains word, even if py is empty
                     return py
                 }
             }
