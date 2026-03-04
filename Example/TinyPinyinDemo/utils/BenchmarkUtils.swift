@@ -8,7 +8,7 @@
 import Foundation
 
 // 与 Android TinyPinyin lib/src/jmh/.../BenchmarkUtils 对齐：提供性能测试用样本与随机生成。
-enum BenchmarkUtils {
+struct BenchmarkUtils {
 
     /// 内置样本长文本（Android 从 sample.txt 读取，此处写死一段足够长的中文）
     nonisolated private static let sampleStr: String = {
@@ -42,6 +42,6 @@ enum BenchmarkUtils {
     }
 
     nonisolated private static func fullSampleStr() -> String {
-        sampleStr
+        return sampleStr
     }
 }

@@ -16,16 +16,26 @@ struct PinyinBenchmarkResult {
     let description: String
 }
 
-enum PinyinBenchmark {
+struct PinyinBenchmark {
 
     /// 小词典（对齐 Android CnCityDict 量级）
     nonisolated private static var smallDict: TestMapDict {
         TestMapDict(map: [
-            "重庆": ["CHONG", "QING"], "长安": ["CHANG", "AN"], "四川": ["SI", "CHUAN"],
-            "北京": ["BEI", "JING"], "上海": ["SHANG", "HAI"], "广州": ["GUANG", "ZHOU"],
-            "深圳": ["SHEN", "ZHEN"], "杭州": ["HANG", "ZHOU"], "南京": ["NAN", "JING"],
-            "武汉": ["WU", "HAN"], "西安": ["XI", "AN"], "成都": ["CHENG", "DU"],
-            "天津": ["TIAN", "JIN"], "苏州": ["SU", "ZHOU"], "郑州": ["ZHENG", "ZHOU"],
+            "重庆": ["CHONG", "QING"],
+            "长安": ["CHANG", "AN"],
+            "四川": ["SI", "CHUAN"],
+            "北京": ["BEI", "JING"],
+            "上海": ["SHANG", "HAI"],
+            "广州": ["GUANG", "ZHOU"],
+            "深圳": ["SHEN", "ZHEN"],
+            "杭州": ["HANG", "ZHOU"],
+            "南京": ["NAN", "JING"],
+            "武汉": ["WU", "HAN"],
+            "西安": ["XI", "AN"],
+            "成都": ["CHENG", "DU"],
+            "天津": ["TIAN", "JIN"],
+            "苏州": ["SU", "ZHOU"],
+            "郑州": ["ZHENG", "ZHOU"],
         ])
     }
 
@@ -48,7 +58,9 @@ enum PinyinBenchmark {
     }
 
     /// 执行单次 benchmark：先预热，再计时跑 iterations 次，返回 (总秒数, 迭代次数)
-    nonisolated private static func measure(iterations: Int, warmup: Int = 100, block: () -> Void) -> (seconds: Double, count: Int) {
+    nonisolated private static func measure(iterations: Int,
+                                            warmup: Int = 100,
+                                            block: () -> Void) -> (seconds: Double, count: Int) {
         for _ in 0..<warmup { block() }
         let start = CFAbsoluteTimeGetCurrent()
         for _ in 0..<iterations { block() }

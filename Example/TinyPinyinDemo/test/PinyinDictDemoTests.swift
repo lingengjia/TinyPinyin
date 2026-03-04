@@ -14,7 +14,6 @@ struct PinyinDictDemoTestResult {
     let message: String
 }
 
-/// File-level test dictionary, nonisolated implements PinyinDict, for use by nonisolated test methods
 struct TestMapDict: PinyinDict, @unchecked Sendable {
     let map: [String: [String]]
     nonisolated func words() -> Set<String> {
@@ -26,7 +25,7 @@ struct TestMapDict: PinyinDict, @unchecked Sendable {
     }
 }
 
-enum PinyinDictDemoTests {
+struct PinyinDictDemoTests {
 
     /// 运行全部测试，返回 (通过数, 失败数, 详情)
     nonisolated static func runAll() -> (passed: Int, failed: Int, results: [PinyinDictDemoTestResult]) {
@@ -105,28 +104,42 @@ enum PinyinDictDemoTests {
             Pinyin.initialize(Pinyin.newConfig().with(dict))
         }
         let r = Pinyin.toPinyin(input, separator: sep)
-        return check(name, r == expected, "expected '\(expected)' got '\(r)'")
+        return check(name,
+                     r == expected,
+                     "expected '\(expected)' got '\(r)'")
     }
 
     // MARK: - Pinyin
 
     private nonisolated static func testInitWithNull() -> PinyinDictDemoTestResult {
-        assertToPinyin("testInitWithNull", input: "中", sep: "", expected: "ZHONG")
+        assertToPinyin("testInitWithNull",
+                       input: "中",
+                       sep: "",
+                       expected: "ZHONG")
     }
 
     private nonisolated static func testInitWithNewConfig() -> PinyinDictDemoTestResult {
         Pinyin.initialize(Pinyin.newConfig())
         let r = Pinyin.toPinyin("中", separator: "")
-        return check("testInitWithNewConfig", r == "ZHONG", "got \(r)")
+        return check("testInitWithNewConfig",
+                     r == "ZHONG",
+                     "got \(r)")
     }
 
     private nonisolated static func testInitWithDict() -> PinyinDictDemoTestResult {
-        assertToPinyin("testInitWithDict", input: "重庆", sep: ",", expected: "CHONG,QING", dict: TestMapDict(map: ["重庆": ["CHONG", "QING"]]))
+        assertToPinyin("testInitWithDict",
+                       input: "重庆",
+                       sep: ",",
+                       expected: "CHONG,QING",
+                       dict: TestMapDict(map: ["重庆": ["CHONG", "QING"]]))
     }
 
     private nonisolated static func testAddNullToNull() -> PinyinDictDemoTestResult {
         Pinyin.add(nil)
-        return assertToPinyin("testAddNullToNull", input: "中", sep: "", expected: "ZHONG")
+        return assertToPinyin("testAddNullToNull",
+                              input: "中",
+                              sep: "",
+                              expected: "ZHONG")
     }
 
     private nonisolated static func testAddNewDict() -> PinyinDictDemoTestResult {
@@ -134,32 +147,47 @@ enum PinyinDictDemoTests {
         Pinyin.add(TestMapDict(map: ["长安": ["CHANG", "AN"]]))
         let a = Pinyin.toPinyin("重庆", separator: ",")
         let b = Pinyin.toPinyin("长安", separator: ",")
-        return check("testAddNewDict", a == "CHONG,QING" && b == "CHANG,AN", "重庆=\(a) 长安=\(b)")
+        return check("testAddNewDict",
+                     a == "CHONG,QING" && b == "CHANG,AN",
+                     "重庆=\(a) 长安=\(b)")
     }
 
     private nonisolated static func testToPinyinCharChinese() -> PinyinDictDemoTestResult {
         let a = Pinyin.toPinyin("中"), b = Pinyin.toPinyin("国")
-        return check("testToPinyinCharChinese", a == "ZHONG" && b == "GUO", "\(a) \(b)")
+        return check("testToPinyinCharChinese",
+                     a == "ZHONG" && b == "GUO",
+                     "\(a) \(b)")
     }
 
     private nonisolated static func testToPinyinCharNonChinese() -> PinyinDictDemoTestResult {
         let a = Pinyin.toPinyin("A"), b = Pinyin.toPinyin("1")
-        return check("testToPinyinCharNonChinese", a == "A" && b == "1", "\(a) \(b)")
+        return check("testToPinyinCharNonChinese",
+                     a == "A" && b == "1",
+                     "\(a) \(b)")
     }
 
     private nonisolated static func testToPinyinStringNoDict() -> PinyinDictDemoTestResult {
-        assertToPinyin("testToPinyinStringNoDict", input: "中国", sep: " ", expected: "ZHONG GUO")
+        assertToPinyin("testToPinyinStringNoDict",
+                       input: "中国",
+                       sep: " ",
+                       expected: "ZHONG GUO")
     }
 
     private nonisolated static func testToPinyinStringWithDict() -> PinyinDictDemoTestResult {
-        assertToPinyin("testToPinyinStringWithDict", input: "重庆和长安", sep: ",", expected: "CHONG,QING,HE,CHANG,AN",
-                       dict: TestMapDict(map: ["重庆": ["CHONG", "QING"], "长安": ["CHANG", "AN"]]))
+        assertToPinyin("testToPinyinStringWithDict",
+                       input: "重庆和长安",
+                       sep: ",",
+                       expected: "CHONG,QING,HE,CHANG,AN",
+                       dict: TestMapDict(map: ["重庆": ["CHONG", "QING"],
+                                               "长安": ["CHANG", "AN"]]))
     }
 
     private nonisolated static func testIsChinese() -> PinyinDictDemoTestResult {
         let c1 = Pinyin.isChinese("中") && Pinyin.isChinese("国")
         let c2 = !Pinyin.isChinese("A") && !Pinyin.isChinese("1")
-        return check("testIsChinese", c1 && c2, "isChinese result wrong")
+        return check("testIsChinese",
+                     c1 && c2,
+                     "isChinese result wrong")
     }
 
     private nonisolated static func testConfigStoredCopy() -> PinyinDictDemoTestResult {
@@ -167,28 +195,48 @@ enum PinyinDictDemoTests {
         Pinyin.initialize(Pinyin.newConfig().with(dictList[0]))
         dictList.removeAll()
         let r = Pinyin.toPinyin("重", separator: "")
-        return check("testConfigStoredCopy", r == "ZHONG", "got \(r)")
+        return check("testConfigStoredCopy",
+                     r == "ZHONG",
+                     "got \(r)")
     }
 
     // MARK: - Engine
 
     private nonisolated static func testToPinyinWithZeroDict() -> PinyinDictDemoTestResult {
-        assertToPinyin("testToPinyinWithZeroDict", input: "重庆和长安都很棒!", sep: ",", expected: "ZHONG,QING,HE,ZHANG,AN,DOU,HEN,BANG,!")
+        assertToPinyin("testToPinyinWithZeroDict",
+                       input: "重庆和长安都很棒!",
+                       sep: ",",
+                       expected: "ZHONG,QING,HE,ZHANG,AN,DOU,HEN,BANG,!")
     }
 
     private nonisolated static func testToPinyinWithOneDict() -> PinyinDictDemoTestResult {
-        let dict = TestMapDict(map: ["重庆": ["CHONG", "QING"], "长安": ["CHANG", "AN"], "四川": ["SI", "CHUAN"]])
-        return assertToPinyin("testToPinyinWithOneDict", input: "重庆和长安都很棒!四川", sep: ",", expected: "CHONG,QING,HE,CHANG,AN,DOU,HEN,BANG,!,SI,CHUAN", dict: dict)
+        let dict = TestMapDict(map: ["重庆": ["CHONG", "QING"],
+                                     "长安": ["CHANG", "AN"],
+                                     "四川": ["SI", "CHUAN"]])
+        return assertToPinyin("testToPinyinWithOneDict",
+                              input: "重庆和长安都很棒!四川",
+                              sep: ",",
+                              expected: "CHONG,QING,HE,CHANG,AN,DOU,HEN,BANG,!,SI,CHUAN",
+                              dict: dict)
     }
 
     private nonisolated static func testToPinyinFirstDictWins() -> PinyinDictDemoTestResult {
-        Pinyin.initialize(Pinyin.newConfig().with(TestMapDict(map: ["重庆": ["CHONG", "QING"]])).with(TestMapDict(map: ["重庆": ["NOT", "MATCH"], "长安": ["CHANG", "AN"]])))
+        Pinyin.initialize(
+            Pinyin.newConfig()
+            .with(TestMapDict(map: ["重庆": ["CHONG", "QING"]]))
+            .with(TestMapDict(map: ["重庆": ["NOT", "MATCH"],
+                                    "长安": ["CHANG", "AN"]]))
+        )
         let r = Pinyin.toPinyin("重庆长安", separator: ",")
-        return check("testToPinyinFirstDictWins", r == "CHONG,QING,CHANG,AN", "got \(r)")
+        return check("testToPinyinFirstDictWins",
+                     r == "CHONG,QING,CHANG,AN",
+                     "got \(r)")
     }
 
     private nonisolated static func testToPinyinEmptyString() -> PinyinDictDemoTestResult {
-        check("testToPinyinEmptyString", Pinyin.toPinyin("", separator: ",") == "", "got non-empty")
+        check("testToPinyinEmptyString",
+              Pinyin.toPinyin("", separator: ",") == "",
+              "got non-empty")
     }
 
     // MARK: - ForwardLongestSelector
@@ -196,14 +244,18 @@ enum PinyinDictDemoTests {
     private nonisolated static func testSelectSingleHit() -> PinyinDictDemoTestResult {
         let list = [Emit(start: 0, end: 4, keyword: "abcde")]
         let r = ForwardLongestSelector().select(list)
-        return check("testSelectSingleHit", r?.count == 1 && r?[0].start == 0 && r?[0].end == 4, "result=\(String(describing: r))")
+        return check("testSelectSingleHit",
+                     r?.count == 1 && r?[0].start == 0 && r?[0].end == 4,
+                     "result=\(String(describing: r))")
     }
 
     private nonisolated static func testSelectMultiHitNoOverlap() -> PinyinDictDemoTestResult {
         let list = [Emit(start: 0, end: 5, keyword: "x"), Emit(start: 7, end: 8, keyword: "x"), Emit(start: 9, end: 10, keyword: "x")]
         let r = ForwardLongestSelector().select(list)
         let ok = r?.count == 3 && r?[0].start == 0 && r?[0].end == 5 && r?[1].start == 7 && r?[1].end == 8 && r?[2].start == 9 && r?[2].end == 10
-        return check("testSelectMultiHitNoOverlap", ok == true, "result=\(String(describing: r))")
+        return check("testSelectMultiHitNoOverlap",
+                     ok == true,
+                     "result=\(String(describing: r))")
     }
 
     private nonisolated static func testSelectMultiHitWithOverlap() -> PinyinDictDemoTestResult {
@@ -214,47 +266,63 @@ enum PinyinDictDemoTests {
         ]
         let r = ForwardLongestSelector().select(list)
         let ok = r?.count == 2 && r?[0].start == 0 && r?[0].end == 5 && r?[1].start == 7 && r?[1].end == 8
-        return check("testSelectMultiHitWithOverlap", ok == true, "result=\(String(describing: r))")
+        return check("testSelectMultiHitWithOverlap",
+                     ok == true,
+                     "result=\(String(describing: r))")
     }
 
     private nonisolated static func testSelectNullReturnsNil() -> PinyinDictDemoTestResult {
-        check("testSelectNullReturnsNil", ForwardLongestSelector().select(nil) == nil, "expected nil")
+        check("testSelectNullReturnsNil",
+              ForwardLongestSelector().select(nil) == nil,
+              "expected nil")
     }
 
     // MARK: - PinyinMapDict
 
     private nonisolated static func testWordsNonnullMapReturnsKeys() -> PinyinDictDemoTestResult {
         let words = TestMapDict(map: ["1": ["ONE"], "2": ["TWO"]]).words()
-        return check("testWordsNonnullMapReturnsKeys", words.count == 2 && words.contains("1") && words.contains("2"), "words=\(words)")
+        return check("testWordsNonnullMapReturnsKeys",
+                     words.count == 2 && words.contains("1") && words.contains("2"),
+                     "words=\(words)")
     }
 
     private nonisolated static func testToPinyinNonnullMapReturnsValue() -> PinyinDictDemoTestResult {
         let r = TestMapDict(map: ["1": ["ONE"]]).toPinyin("1")
-        return check("testToPinyinNonnullMapReturnsValue", r == ["ONE"], "\(String(describing: r))")
+        return check("testToPinyinNonnullMapReturnsValue",
+                     r == ["ONE"],
+                     "\(String(describing: r))")
     }
 
     private nonisolated static func testToPinyinNonnullMapNoKeyReturnsNil() -> PinyinDictDemoTestResult {
-        check("testToPinyinNonnullMapNoKeyReturnsNil", TestMapDict(map: ["1": ["ONE"]]).toPinyin("2") == nil, "expected nil")
+        check("testToPinyinNonnullMapNoKeyReturnsNil",
+              TestMapDict(map: ["1": ["ONE"]]).toPinyin("2") == nil,
+              "expected nil")
     }
 
     // MARK: - Utils behavior
 
     private nonisolated static func testInitWithEmptyConfigNoDict() -> PinyinDictDemoTestResult {
         Pinyin.initialize(Pinyin.newConfig())
-        return check("testInitWithEmptyConfigNoDict", Pinyin.toPinyin("中", separator: "") == "ZHONG", "got wrong")
+        return check("testInitWithEmptyConfigNoDict",
+                     Pinyin.toPinyin("中", separator: "") == "ZHONG",
+                     "got wrong")
     }
 
     private nonisolated static func testInitWithDictBuildsTrie() -> PinyinDictDemoTestResult {
-        assertToPinyin("testInitWithDictBuildsTrie", input: "重庆", sep: ",", expected: "CHONG,QING", dict: TestMapDict(map: ["重庆": ["CHONG", "QING"]]))
+        assertToPinyin("testInitWithDictBuildsTrie",
+                       input: "重庆",
+                       sep: ",", expected: "CHONG,QING",
+                       dict: TestMapDict(map: ["重庆": ["CHONG", "QING"]]))
     }
 
     private nonisolated static func testKeywordsSortedOrderDeterministic() -> PinyinDictDemoTestResult {
         let dict = TestMapDict(map: ["中国": ["ZHONG", "GUO"], "重庆": ["CHONG", "QING"]])
         Pinyin.initialize(Pinyin.newConfig().with(dict))
         let r1 = Pinyin.toPinyin("中国重庆", separator: ",")
-        Pinyin.initialize(nil)
         Pinyin.initialize(Pinyin.newConfig().with(dict))
         let r2 = Pinyin.toPinyin("中国重庆", separator: ",")
-        return check("testKeywordsSortedOrderDeterministic", r1 == r2, "\(r1) vs \(r2)")
+        return check("testKeywordsSortedOrderDeterministic",
+                     r1 == r2,
+                     "\(r1) vs \(r2)")
     }
 }
