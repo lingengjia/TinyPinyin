@@ -45,6 +45,14 @@ class ViewController: UIViewController {
         return btn
     }()
 
+    private let benchmarkButton: UIButton = {
+        let btn = UIButton(type: .system)
+        btn.setTitle("运行性能测试", for: .normal)
+        btn.titleLabel?.font = .systemFont(ofSize: 17, weight: .medium)
+        btn.translatesAutoresizingMaskIntoConstraints = false
+        return btn
+    }()
+
     private let resultLabel: UILabel = {
         let label = UILabel()
         label.numberOfLines = 0
@@ -68,10 +76,12 @@ class ViewController: UIViewController {
         view.addSubview(separatorTextField)
         view.addSubview(convertButton)
         view.addSubview(testButton)
+        view.addSubview(benchmarkButton)
         view.addSubview(resultLabel)
 
         convertButton.addTarget(self, action: #selector(convertTapped), for: .touchUpInside)
         testButton.addTarget(self, action: #selector(runTestsTapped), for: .touchUpInside)
+        benchmarkButton.addTarget(self, action: #selector(runBenchmarkTapped), for: .touchUpInside)
 
         NSLayoutConstraint.activate([
             inputTextField.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 24),
@@ -90,7 +100,10 @@ class ViewController: UIViewController {
             testButton.topAnchor.constraint(equalTo: convertButton.bottomAnchor, constant: 12),
             testButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
 
-            resultLabel.topAnchor.constraint(equalTo: testButton.bottomAnchor, constant: 24),
+            benchmarkButton.topAnchor.constraint(equalTo: testButton.bottomAnchor, constant: 12),
+            benchmarkButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+
+            resultLabel.topAnchor.constraint(equalTo: benchmarkButton.bottomAnchor, constant: 24),
             resultLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             resultLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
         ])
@@ -121,6 +134,28 @@ class ViewController: UIViewController {
         let alert = UIAlertController(title: "测试结果", message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "确定", style: .default))
         present(alert, animated: true)
+    }
+
+    @objc private func runBenchmarkTapped() {
+        resultLabel.text = "性能测试中…"
+        resultLabel.textColor = .secondaryLabel
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            let results = PinyinBenchmark.runAll()
+            let lines = results.map { "\($0.name): \($0.description)" }
+            let message = "TinyPinyin 性能\n\n" + lines.joined(separator: "\n")
+            print("========== TinyPinyin 性能测试 ==========")
+            for r in results {
+                print("  \(r.name): \(r.description)")
+            }
+            print("==========================================")
+            DispatchQueue.main.async {
+                self?.resultLabel.text = message
+                self?.resultLabel.textColor = .label
+                let alert = UIAlertController(title: "性能测试", message: message, preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "确定", style: .default))
+                self?.present(alert, animated: true)
+            }
+        }
     }
 
     private func demo() {

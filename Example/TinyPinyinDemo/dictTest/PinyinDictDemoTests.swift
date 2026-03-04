@@ -61,7 +61,6 @@ enum PinyinDictDemoTests {
         for run in allCases {
             Pinyin.initialize(nil)
             let r = run()
-            Pinyin.initialize(nil)
             results.append(r)
         }
         let passed = results.filter(\.passed).count
@@ -179,7 +178,7 @@ enum PinyinDictDemoTests {
 
     private nonisolated static func testToPinyinWithOneDict() -> PinyinDictDemoTestResult {
         let dict = TestMapDict(map: ["重庆": ["CHONG", "QING"], "长安": ["CHANG", "AN"], "四川": ["SI", "CHUAN"]])
-        assertToPinyin("testToPinyinWithOneDict", input: "重庆和长安都很棒!四川", sep: ",", expected: "CHONG,QING,HE,CHANG,AN,DOU,HEN,BANG,!,SI,CHUAN", dict: dict)
+        return assertToPinyin("testToPinyinWithOneDict", input: "重庆和长安都很棒!四川", sep: ",", expected: "CHONG,QING,HE,CHANG,AN,DOU,HEN,BANG,!,SI,CHUAN", dict: dict)
     }
 
     private nonisolated static func testToPinyinFirstDictWins() -> PinyinDictDemoTestResult {
